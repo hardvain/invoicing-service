@@ -25,9 +25,9 @@ class MongoDBQueryBuilder {
     val field = rangeFilter.field
     val bsonList = ListBuffer[Bson]()
     rangeFilter.gt.map(gtValue => bsonList += gt(field, gtValue))
-    rangeFilter.gte.map(gteValue => bsonList += gt(field, gteValue))
-    rangeFilter.lt.map(ltValue => bsonList += gt(field, ltValue))
-    rangeFilter.lte.map(lteValue => bsonList += gt(field, lteValue))
+    rangeFilter.gte.map(gteValue => bsonList += gte(field, gteValue))
+    rangeFilter.lt.map(ltValue => bsonList += lt(field, ltValue))
+    rangeFilter.lte.map(lteValue => bsonList += lte(field, lteValue))
     and(bsonList:_*)
   }
 

@@ -25,6 +25,8 @@ object InvoiceFilter {
 
   case class MatchFilter(field: String, value: Any) extends Filter
 
-  case class RangeFilter(field: String, gt: Option[Any], gte: Option[Any], lt: Option[Any], lte: Option[Any]) extends Filter
+  case class RangeFilter(
+                          field: String, gt: Option[Any] = None, gte: Option[Any] = None, lt: Option[Any] = None,
+                          lte: Option[Any] = None) extends Filter
 
 }
