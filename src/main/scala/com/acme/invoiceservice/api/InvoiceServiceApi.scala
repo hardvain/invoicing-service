@@ -19,7 +19,10 @@ case class InvoiceServiceApi(config: InvoiceServiceConfig, invoicingService: Inv
     path("invoices") {
       get {
         parameterMap { params =>
-          val invoices: List[Invoice] = invoicingService.getInvoiceForFilters(params)
+          val invoices: List[Invoice] = params.size match {
+            case 0 => invoicingService.getAllInvoices
+            case _ => invoicingService.getInvoiceForFilters(params)
+          }
           val response = invoices.length match {
             case 0 =>
               "The filter criteria yielded no results"

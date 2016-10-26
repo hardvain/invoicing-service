@@ -1,13 +1,12 @@
 package com.acme.invoiceservice.api
 
-import akka.actor.Actor.Receive
 import akka.actor.{Actor, ActorRefFactory}
 import com.acme.invoiceservice.InvoiceServiceConfig
 import com.acme.invoiceservice.services.InvoicingService
 import spray.routing.HttpService
 
 class InvoiceServiceActor(config: InvoiceServiceConfig, invoicingService: InvoicingService) extends Actor with HttpService {
-  private val invoiceServiceApi: InvoiceServiceApi = new InvoiceServiceApi(config, invoicingService, context)
+  private val invoiceServiceApi: InvoiceServiceApi = InvoiceServiceApi(config, invoicingService, context)
 
   implicit val executionContext = context.system
 
