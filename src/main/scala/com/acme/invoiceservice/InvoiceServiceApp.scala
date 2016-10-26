@@ -1,15 +1,10 @@
 package com.acme.invoiceservice
 
-import java.io.InputStreamReader
-
-import spray.routing.RejectionHandler.Default
-import akka.actor.Actor.Receive
-import akka.actor.{Actor, ActorRef, ActorRefFactory, ActorSystem, Props}
+import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.io.IO
 import com.acme.invoiceservice.api.InvoiceServiceApi
-import com.typesafe.config.{Config, ConfigFactory, ConfigParseOptions, ConfigSyntax}
+import com.typesafe.config.ConfigFactory
 import spray.can.Http
-import spray.routing.{HttpService, Route}
 
 object InvoiceServiceApp extends App {
   implicit val system = ActorSystem("com-acme-invoiceservice")

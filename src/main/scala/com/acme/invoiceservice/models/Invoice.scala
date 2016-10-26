@@ -5,8 +5,8 @@ import spray.json._
 import DefaultJsonProtocol._
 case class Invoice(
                     invoiceId: String, customerId: String, address: String, month: Int, invoiceType: String,
-                    invoiceTypeLocalized: String, invoiceDate: DateTime, paymentDueDate: DateTime, invoiceNumber: Int,
-                    startDate: DateTime, endDate: DateTime, periodDescription: String, amount: Double, vatAmount: Double,
+                    invoiceTypeLocalized: String, invoiceDate: String, paymentDueDate: String, invoiceNumber: Int,
+                    startDate: String, endDate: String, periodDescription: String, amount: Double, vatAmount: Double,
                     totalAmount: Double)
 
 object InvoiceProtocol extends DefaultJsonProtocol{

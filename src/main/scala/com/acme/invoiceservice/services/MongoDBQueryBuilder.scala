@@ -1,7 +1,6 @@
 package com.acme.invoiceservice.services
 
 import com.acme.invoiceservice.models.InvoiceFilter._
-import com.mongodb.{DBObject, QueryBuilder}
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters._
 
