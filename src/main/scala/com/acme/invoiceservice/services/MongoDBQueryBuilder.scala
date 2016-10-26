@@ -7,7 +7,7 @@ import org.mongodb.scala.model.Filters._
 
 import scala.collection.mutable.ListBuffer
 
-class MongoDBQueryBuilder(entity: String) {
+class MongoDBQueryBuilder {
   def build(invoiceFilter: Filter): Bson = {
     invoiceFilter match {
       case filter: AndFilter => buildFromAndFilter(filter)

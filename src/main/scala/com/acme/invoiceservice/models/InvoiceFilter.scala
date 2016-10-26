@@ -8,9 +8,9 @@ object InvoiceFilter {
 
   case class OrFilter(filters: List[Filter]) extends Filter
 
-  case class NotFilter(filter: Filter)
+  case class NotFilter(filter: Filter) extends Filter
 
-  case class MatchFilter(field: String, value: Any)
+  case class MatchFilter(field: String, value: Any) extends Filter
 
-  case class RangeFilter(field: String, gt: Option[Any], gte: Option[Any], lt: Option[Any], lte: Option[Any])
+  case class RangeFilter(field: String, gt: Option[Any], gte: Option[Any], lt: Option[Any], lte: Option[Any]) extends Filter
 }

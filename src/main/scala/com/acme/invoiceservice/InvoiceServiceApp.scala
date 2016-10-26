@@ -19,11 +19,6 @@ object InvoiceServiceApp extends App {
   IO(Http) ! Http.Bind(invoiceApiActor, invoiceServiceConfig.host, invoiceServiceConfig.port)
 }
 
-case class InvoiceServiceConfig(config: Config) {
-  private val acme = config.getConfig("com.acme")
-  val host = acme.getString("host")
-  val port = acme.getInt("port")
-}
 
 
 
