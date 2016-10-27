@@ -2,6 +2,7 @@ package com.acme.invoiceservice.api
 
 import akka.actor.ActorRefFactory
 import com.acme.invoiceservice.InvoiceServiceConfig
+import com.acme.invoiceservice.models.Invoice.InvoiceProtocol._
 import com.acme.invoiceservice.models.{InMemoryInvoiceFilter, Invoice, PurchaseType}
 import com.acme.invoiceservice.repository.InMemoryRepository
 import com.acme.invoiceservice.services.InvoicingService
@@ -9,15 +10,9 @@ import com.typesafe.config.ConfigFactory
 import org.joda.time.DateTime
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FreeSpec, Matchers}
-import spray.http.{HttpEntity, MediaTypes}
+import spray.http.{HttpEntity, MediaTypes, StatusCodes}
+import spray.json._
 import spray.testkit.ScalatestRouteTest
-import spray.json._
-import spray.http.MediaTypes._
-import spray.http.{HttpEntity, StatusCodes}
-import spray.httpx.SprayJsonSupport._
-import spray.json._
-import spray.routing._
-import Invoice.InvoiceProtocol._
 
 /**
   * This test sets up few invoice data ahead and tests all the requirements mentioned in the problem
@@ -113,6 +108,16 @@ class RequirementsSpec extends FreeSpec with ScalatestRouteTest with Matchers wi
         Get("/sysapi/v1.0/invoices?customerId=customer1&address=address3") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           assert(responseAs[String] == "The filter criteria yielded no results")
+        }
+      }
+    }
+    "get all invoices " - {
+      "return matching value if present" in {
+        Get("/sysapi/v1.0/invoices") ~> invoiceServiceApi.routes ~> check {
+          status should be(StatusCodes.OK)
+          val json = responseAs[String].parseJson
+          assert(json.isInstanceOf[JsArray])
+          assert(json.asInstanceOf[JsArray].elements.size == 10)
         }
       }
     }

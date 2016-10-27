@@ -2,6 +2,8 @@ package com.acme.invoiceservice.api
 
 import akka.actor.ActorRefFactory
 import com.acme.invoiceservice.InvoiceServiceConfig
+import com.acme.invoiceservice.api.InvoiceServiceApi._
+import com.acme.invoiceservice.exceptions.ApplicationException
 import com.acme.invoiceservice.models.{Invoice, PurchaseType}
 import com.acme.invoiceservice.repository.Repository
 import com.acme.invoiceservice.services.InvoicingService
@@ -10,11 +12,7 @@ import org.joda.time.DateTime
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FreeSpec, Matchers}
 import spray.http.{HttpEntity, MediaTypes, StatusCodes}
-import spray.json.DeserializationException
-import spray.routing._
 import spray.testkit.ScalatestRouteTest
-import com.acme.invoiceservice.api.InvoiceServiceApi._
-import com.acme.invoiceservice.exceptions.ApplicationException
 
 class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matchers with MockFactory {
 

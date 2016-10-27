@@ -4,6 +4,7 @@ import org.scalatest.{FreeSpec, Matchers}
 import com.acme.invoiceservice.models.Invoice.InvoiceProtocol._
 import org.joda.time.DateTime
 import spray.json._
+
 class InvoiceProtocolSpec extends FreeSpec with Matchers{
   "InvoiceProtocol"-{
     "should throw error when given wrong json for date" in {

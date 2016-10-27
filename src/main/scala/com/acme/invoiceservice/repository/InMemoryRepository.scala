@@ -2,7 +2,6 @@ package com.acme.invoiceservice.repository
 
 import com.acme.invoiceservice.models.InMemoryEntityFilter
 import com.acme.invoiceservice.models.InvoiceFilter._
-
 import scala.collection.mutable.ListBuffer
 
 /**

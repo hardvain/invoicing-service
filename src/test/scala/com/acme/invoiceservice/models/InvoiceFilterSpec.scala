@@ -1,6 +1,6 @@
 package com.acme.invoiceservice.models
 
-import com.acme.invoiceservice.models.InvoiceFilter.{AndFilter, Filter, MatchFilter}
+import com.acme.invoiceservice.models.InvoiceFilter._
 import org.scalatest.FreeSpec
 
 class InvoiceFilterSpec extends FreeSpec {
