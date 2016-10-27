@@ -2,7 +2,7 @@ package com.acme.invoiceservice.api
 
 import akka.actor.ActorRefFactory
 import com.acme.invoiceservice.InvoiceServiceConfig
-import com.acme.invoiceservice.models.{InMemoryInvoiceFilter, Invoice}
+import com.acme.invoiceservice.models.{InMemoryInvoiceFilter, Invoice, PurchaseType}
 import com.acme.invoiceservice.repository.InMemoryRepository
 import com.acme.invoiceservice.services.InvoicingService
 import com.typesafe.config.ConfigFactory
@@ -29,16 +29,16 @@ class RequirementsSpec extends FreeSpec with ScalatestRouteTest with Matchers wi
   val dateTime: DateTime = DateTime.now()
 
   private val invoices = List(
-    Invoice("1", "customer1", "address1", 1, "shop", "invoice", dateTime, dateTime, 1, dateTime, dateTime, "description", 10, 10, 10),
-    Invoice("2", "customer2", "address2", 2, "regular", "invoice", dateTime, dateTime, 2, dateTime, dateTime, "description", 10, 10, 10),
-    Invoice("3", "customer3", "address3", 3, "shop", "invoice", dateTime, dateTime, 3, dateTime, dateTime, "description", 10, 10, 10),
-    Invoice("4", "customer4", "address4", 4, "regular", "invoice", dateTime, dateTime, 4, dateTime, dateTime, "description", 10, 10, 10),
-    Invoice("5", "customer5", "address5", 5, "regular", "invoice", dateTime, dateTime, 5, dateTime, dateTime, "description", 10, 10, 10),
-    Invoice("6", "customer6", "address6", 6, "regular", "invoice", dateTime, dateTime, 6, dateTime, dateTime, "description", 10, 10, 10),
-    Invoice("7", "customer7", "address7", 7, "regular", "invoice", dateTime, dateTime, 7, dateTime, dateTime, "description", 10, 10, 10),
-    Invoice("8", "customer8", "address8", 8, "regular", "invoice", dateTime, dateTime, 8, dateTime, dateTime, "description", 10, 10, 10),
-    Invoice("9", "customer9", "address9", 9, "regular", "invoice", dateTime, dateTime, 9, dateTime, dateTime, "description", 10, 10, 10),
-    Invoice("10", "customer1", "address10", 10, "regular", "invoice", dateTime, dateTime, 10, dateTime, dateTime, "description", 10, 10, 10)
+    Invoice("1", "customer1", "address1", 1, PurchaseType.Shop, "invoice", dateTime, dateTime, 1, dateTime, dateTime, "description", 10, 10, 10),
+    Invoice("2", "customer2", "address2", 2, PurchaseType.Regular, "invoice", dateTime, dateTime, 2, dateTime, dateTime, "description", 10, 10, 10),
+    Invoice("3", "customer3", "address3", 3, PurchaseType.Shop, "invoice", dateTime, dateTime, 3, dateTime, dateTime, "description", 10, 10, 10),
+    Invoice("4", "customer4", "address4", 4, PurchaseType.Regular, "invoice", dateTime, dateTime, 4, dateTime, dateTime, "description", 10, 10, 10),
+    Invoice("5", "customer5", "address5", 5, PurchaseType.Regular, "invoice", dateTime, dateTime, 5, dateTime, dateTime, "description", 10, 10, 10),
+    Invoice("6", "customer6", "address6", 6, PurchaseType.Regular, "invoice", dateTime, dateTime, 6, dateTime, dateTime, "description", 10, 10, 10),
+    Invoice("7", "customer7", "address7", 7, PurchaseType.Regular, "invoice", dateTime, dateTime, 7, dateTime, dateTime, "description", 10, 10, 10),
+    Invoice("8", "customer8", "address8", 8, PurchaseType.Regular, "invoice", dateTime, dateTime, 8, dateTime, dateTime, "description", 10, 10, 10),
+    Invoice("9", "customer9", "address9", 9, PurchaseType.Regular, "invoice", dateTime, dateTime, 9, dateTime, dateTime, "description", 10, 10, 10),
+    Invoice("10", "customer1", "address10", 10, PurchaseType.Regular, "invoice", dateTime, dateTime, 10, dateTime, dateTime, "description", 10, 10, 10)
   )
   private val invoiceServiceApi: InvoiceServiceApi = InvoiceServiceApi(invoiceServiceConfig, invoicingService, context)
 
@@ -68,7 +68,7 @@ class RequirementsSpec extends FreeSpec with ScalatestRouteTest with Matchers wi
 
     "get invoice by customer, invoice type and month" - {
       "return matching value if present" in {
-        Get("/sysapi/v1.0/invoices?customerId=customer1&month=1&invoiceType=shop") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices?customerId=customer1&month=1&purchaseType=shop") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           val json = responseAs[String].parseJson
           assert(json.isInstanceOf[JsArray])
@@ -76,7 +76,7 @@ class RequirementsSpec extends FreeSpec with ScalatestRouteTest with Matchers wi
         }
       }
       "return no result found if not present" in {
-        Get("/sysapi/v1.0/invoices?customerId=customer1&month=1&invoiceType=regular") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices?customerId=customer1&month=1&purchaseType=regular") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           assert(responseAs[String] == "The filter criteria yielded no results")
         }

@@ -1,10 +1,25 @@
 package com.acme.invoiceservice.models
 
+import com.acme.invoiceservice.models.PurchaseType.PropertyType
 import org.joda.time.DateTime
 import spray.json.{DefaultJsonProtocol, DeserializationException, JsString, JsValue, RootJsonFormat}
 
+object PurchaseType extends Enumeration {
+  val Shop = Value("shop")
+  val Regular = Value("regular")
+  type PropertyType = Value
+
+  def parseString(string:String)={
+    string match {
+      case "shop" => Shop
+      case "regular" => Regular
+    }
+  }
+}
+
+
 case class Invoice(
-                    invoiceId: String, customerId: String, address: String, month: Int, invoiceType: String,
+                    invoiceId: String, customerId: String, address: String, month: Int, purchaseType: PurchaseType.PropertyType,
                     invoiceTypeLocalized: String, invoiceDate: DateTime, paymentDueDate: DateTime, invoiceNumber: Int,
                     startDate: DateTime, endDate: DateTime, periodDescription: String, amount: Double, vatAmount: Double,
                     totalAmount: Double)
@@ -28,6 +43,19 @@ object Invoice{
         JsString(obj.toString())
       }
     }
+    implicit val purchaseTypeFormat : RootJsonFormat[PurchaseType.PropertyType] = new RootJsonFormat[PropertyType] {
+      override def read(json: JsValue): PropertyType = {
+        json match {
+          case JsString(value) => PurchaseType.parseString(value)
+          case _ => throw DeserializationException(s"$json cannot be converted to date time")
+        }
+      }
+
+      override def write(obj: PropertyType): JsValue = {
+        JsString(obj.toString)
+      }
+    }
+
     implicit val sprayFormat = jsonFormat15(Invoice.apply)
   }
 

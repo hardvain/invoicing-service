@@ -2,7 +2,7 @@ package com.acme.invoiceservice.api
 
 import akka.actor.ActorRefFactory
 import com.acme.invoiceservice.InvoiceServiceConfig
-import com.acme.invoiceservice.models.Invoice
+import com.acme.invoiceservice.models.{Invoice, PurchaseType}
 import com.acme.invoiceservice.repository.Repository
 import com.acme.invoiceservice.services.InvoicingService
 import com.typesafe.config.ConfigFactory
@@ -29,9 +29,9 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
     "GET" - {
       "should return 200 OK when a GET request is made " in {
         val invoices = List(
-          Invoice("1", "customer1", "address1", 1, "regular", "invoice", dateTime, dateTime, 1, dateTime, dateTime, "description", 10, 10, 10),
-          Invoice("1", "customer2", "address2", 2, "regular", "invoice", dateTime, dateTime, 2, dateTime, dateTime, "description", 10, 10, 10),
-          Invoice("1", "customer3", "address3", 3, "regular", "invoice", dateTime, dateTime, 3, dateTime, dateTime, "description", 10, 10, 10)
+          Invoice("1", "customer1", "address1", 1, PurchaseType.Regular, "invoice", dateTime, dateTime, 1, dateTime, dateTime, "description", 10, 10, 10),
+          Invoice("1", "customer2", "address2", 2, PurchaseType.Regular, "invoice", dateTime, dateTime, 2, dateTime, dateTime, "description", 10, 10, 10),
+          Invoice("1", "customer3", "address3", 3, PurchaseType.Regular, "invoice", dateTime, dateTime, 3, dateTime, dateTime, "description", 10, 10, 10)
         )
         val parameterMap = Map("customerId" -> "customer1", "addressId" -> "address1")
         (mockInvoicingService.getInvoiceForFilters _).expects(parameterMap).returns(invoices)
@@ -71,7 +71,7 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
       val customerId: String = "customer1"
       val address: String = "random address"
       val month: String = """3"""
-      val invoiceType: String = "regular"
+      val purchaseType: String = "regular"
       val invoiceLocalized: String = "locale specific invoice"
       val date: String = s"${dateTime.toString()}"
       val invoiceNumber: String = """1"""
@@ -83,12 +83,12 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
         val dataJsonString =
           s"""
           { "invoiceId":"$invoiceId", "customerId":"$customerId", "address":"$address", "month":$month,
-            "invoiceType":"$invoiceType", "invoiceTypeLocalized":"$invoiceLocalized", "invoiceDate":"${dateTime.toString}",
+            "purchaseType":"$purchaseType", "invoiceTypeLocalized":"$invoiceLocalized", "invoiceDate":"${dateTime.toString}",
             "paymentDueDate":"${dateTime.toString}", "invoiceNumber":$invoiceNumber, "startDate":"${dateTime.toString}", "endDate":"${dateTime.toString}",
             "periodDescription":"$description", "amount":$amount, "vatAmount":$vatAmount, "totalAmount":$totalAmount
           }
         """.stripMargin
-        val invoice = Invoice(invoiceId, customerId, address, month.toInt, invoiceType, invoiceLocalized, dateTime, dateTime,
+        val invoice = Invoice(invoiceId, customerId, address, month.toInt, PurchaseType.parseString(purchaseType), invoiceLocalized, dateTime, dateTime,
           invoiceNumber.toInt, dateTime, dateTime, description, amount.toDouble, vatAmount.toDouble, totalAmount.toDouble)
         (mockInvoicingService.addInvoice _).expects(*)
         Post("/sysapi/v1.0/invoices", HttpEntity(MediaTypes.`application/json`, dataJsonString)) ~> invoiceServiceApi.routes ~> check {
@@ -100,7 +100,7 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
         val dataJsonString =
           s"""
           { "invoiceId":"$invoiceId",  "address":"$address", "month":$month,
-            "invoiceType":"$invoiceType", "invoiceTypeLocalized":"$invoiceLocalized", "invoiceDate":"$date",
+            "purchaseType":"$purchaseType", "invoiceTypeLocalized":"$invoiceLocalized", "invoiceDate":"$date",
             "paymentDueDate":"$date", "invoiceNumber":$invoiceNumber, "startDate":"$date", "endDate":"$date",
             "periodDescription":"$description", "amount":$amount, "vatAmount":$vatAmount, "totalAmount":$totalAmount
           }
@@ -114,12 +114,12 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
         val dataJsonString =
           s"""
           { "invoiceId":"$invoiceId", "customerId":"$customerId", "address":"$address", "month":$month,
-            "invoiceType":"$invoiceType", "invoiceTypeLocalized":"$invoiceLocalized", "invoiceDate":"${dateTime.toString}",
+            "purchaseType":"$purchaseType", "invoiceTypeLocalized":"$invoiceLocalized", "invoiceDate":"${dateTime.toString}",
             "paymentDueDate":"${dateTime.toString}", "invoiceNumber":$invoiceNumber, "startDate":"${dateTime.toString}", "endDate":"${dateTime.toString}",
             "periodDescription":"$description", "amount":$amount, "vatAmount":$vatAmount, "totalAmount":$totalAmount
           }
         """.stripMargin
-        val invoice = Invoice(invoiceId, customerId, address, month.toInt, invoiceType, invoiceLocalized, dateTime, dateTime,
+        val invoice = Invoice(invoiceId, customerId, address, month.toInt, PurchaseType.parseString(purchaseType), invoiceLocalized, dateTime, dateTime,
           invoiceNumber.toInt, dateTime, dateTime, description, amount.toDouble, vatAmount.toDouble, totalAmount.toDouble)
         val exceptionMessage: String = "Oops, something went wrong adding the invocie"
         (mockInvoicingService.addInvoice _).expects(*).throws(ApplicationException(exceptionMessage))
