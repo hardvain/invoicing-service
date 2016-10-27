@@ -7,9 +7,7 @@ class MongoRepository {
     List()
   }
 
-  def getAll[A] : List[A] ={
+  def getAll[A]() : List[A] ={
     List()
   }
 }
-
-

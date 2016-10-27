@@ -4,6 +4,13 @@ import com.acme.invoiceservice.models.InvoiceFilter._
 import org.mongodb.scala.bson.conversions.Bson
 import org.scalatest.{FreeSpec, Matchers}
 
+/**
+  * The method of testing used in this test is fragile. Asserting against strings. Because refactoring the logic will
+  * not result in the expected output getting changed automatically. Unfortunately MongoDB doesnot provide a way to
+  * assert the state of BSON. Ideally this should have been an intergration test where each test inserts data into
+  * MongoDB, runs the query and asserts on the result. Since we will be asserting on the result which will be
+  * a list of Invoice objects, refactoring the builders or filters can be made in a deterministic manner.
+  */
 class MongoDQueryBuilderSpec extends FreeSpec with Matchers {
   private val mongoDBQueryBuilder: MongoDBQueryBuilder = new MongoDBQueryBuilder
   "MongoDBQueryBuilder" - {
