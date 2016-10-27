@@ -10,18 +10,24 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FreeSpec, Matchers}
 import spray.http.HttpHeaders.`Content-Type`
 import spray.http.MediaTypes._
-import spray.http.StatusCodes
+import spray.http.{HttpEntity, MediaTypes, StatusCodes}
 import spray.json.DeserializationException
-import spray.routing.ExceptionHandler
+import spray.routing._
 import spray.testkit.ScalatestRouteTest
 
 class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matchers with MockFactory {
 
   class InvoicingServiceStub extends InvoicingService(mock[Repository[Invoice]])
+
+  implicit def customRejectionHandler = RejectionHandler {
+    case MalformedRequestContentRejection(message, throwable) :: _ => ctx => ctx.complete(StatusCodes.BadRequest, message)
+  }
+
   implicit def exceptionHandler = ExceptionHandler {
-    case e:DeserializationException =>
+    case e: DeserializationException =>
       ctx => ctx.complete(StatusCodes.BadRequest, e.msg)
   }
+
   private val mockInvoicingService: InvoicingService = mock[InvoicingServiceStub]
   val context = mock[ActorRefFactory]
   private val invoiceServiceConfig: InvoiceServiceConfig = InvoiceServiceConfig(ConfigFactory.load())
@@ -83,7 +89,7 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
         val invoice = Invoice(invoiceId, customerId, address, month.toInt, invoiceType, invoiceLocalized, date, date,
           invoiceNumber.toInt, date, date, description, amount.toDouble, vatAmount.toDouble, totalAmount.toDouble)
         (mockInvoicingService.addInvoice _).expects(invoice)
-        Post("/invoices", dataJsonString) ~> addHeader(`Content-Type`(`application/json`)) ~> invoiceServiceApi.routes ~> check {
+        Post("/invoices", HttpEntity(MediaTypes.`application/json`, dataJsonString)) ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
         }
       }
@@ -97,7 +103,7 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
             "periodDescription":"$description", "amount":$amount, "vatAmount":$vatAmount, "totalAmount":$totalAmount
           }
         """.stripMargin
-        Post("/invoices", dataJsonString) ~> addHeader(`Content-Type`(`application/json`)) ~> invoiceServiceApi.routes ~> check {
+        Post("/invoices", HttpEntity(MediaTypes.`application/json`, dataJsonString)) ~> invoiceServiceApi.sealRoute(invoiceServiceApi.routes) ~> check {
           status should be(StatusCodes.BadRequest)
         }
       }

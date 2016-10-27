@@ -5,8 +5,7 @@ import com.acme.invoiceservice.InvoiceServiceConfig
 import com.acme.invoiceservice.services.InvoicingService
 import spray.http.StatusCodes
 import spray.json.DeserializationException
-import spray.routing.{HttpService,RejectionHandler,ExceptionHandler,Route,RequestContext,RoutingSettings}
-import spray.util.LoggingContext
+import spray.routing._
 
 class InvoiceServiceActor(config: InvoiceServiceConfig, invoicingService: InvoicingService) extends Actor with HttpService {
   private val invoiceServiceApi: InvoiceServiceApi = InvoiceServiceApi(config, invoicingService, context)
@@ -14,9 +13,13 @@ class InvoiceServiceActor(config: InvoiceServiceConfig, invoicingService: Invoic
   implicit val executionContext = context.system
 
 
-  implicit def exceptionHandler = ExceptionHandler {
+  implicit def customExceptionHandler = ExceptionHandler {
     case e:DeserializationException =>
       ctx => ctx.complete(StatusCodes.BadRequest, e.msg)
+  }
+
+  implicit def customRejectionHandler = RejectionHandler {
+    case List(r:MalformedRequestContentRejection) => ctx => ctx.complete(StatusCodes.BadRequest, r.message)
   }
 
   override def receive: Receive = runRoute(invoiceServiceApi.routes)

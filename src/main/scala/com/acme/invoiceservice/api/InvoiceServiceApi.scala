@@ -9,7 +9,6 @@ import spray.http.{HttpEntity, StatusCodes}
 import spray.json._
 import spray.routing._
 import com.acme.invoiceservice.models.InvoiceProtocol._
-import DefaultJsonProtocol._
 import spray.httpx.SprayJsonSupport._
 case class InvoiceServiceApi(config: InvoiceServiceConfig, invoicingService: InvoicingService, refFactory: ActorRefFactory)
   extends HttpService {
@@ -24,19 +23,16 @@ case class InvoiceServiceApi(config: InvoiceServiceConfig, invoicingService: Inv
             case _ => invoicingService.getInvoiceForFilters(params)
           }
           val response = invoices.length match {
-            case 0 =>
-              "The filter criteria yielded no results"
-            case _ =>
-              JsArray(invoices.map(_.toJson).toVector).toString()
+            case 0 => "The filter criteria yielded no results"
+            case _ => JsArray(invoices.map(_.toJson).toVector).toString()
           }
           complete(StatusCodes.OK, HttpEntity(`application/json`, response))
         }
       } ~
       post{
-        entity(as[String]) { invoiceString =>
-            val invoice: Invoice = invoiceString.parseJson.convertTo[Invoice]
+        entity(as[Invoice]) { invoice =>
             invoicingService.addInvoice(invoice)
-            complete("")
+            complete(StatusCodes.OK)
         }
       }
     }
