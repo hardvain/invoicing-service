@@ -2,16 +2,19 @@ package com.acme.invoiceservice.services
 
 import com.acme.invoiceservice.models.Invoice
 import com.acme.invoiceservice.models.InvoiceFilter._
-import com.acme.invoiceservice.repository.MongoRepository
+import com.acme.invoiceservice.repository.{MongoRepository, Repository}
 
-case class InvoicingService(mongoDBQueryBuilder: MongoDBQueryBuilder, mongoRepository: MongoRepository) {
+case class InvoicingService(repository: Repository[Invoice]) {
   def getInvoiceForFilters(filterMap: Map[String, String]): List[Invoice] = {
     val filter = Filter.fromMap(filterMap)
-    val invoiceMongoFilter = mongoDBQueryBuilder.build(filter)
-    mongoRepository.query(invoiceMongoFilter)
+    repository.query(filter)
   }
 
   def getAllInvoices : List[Invoice] ={
-    mongoRepository.getAll
+    repository.getAll
+  }
+
+  def addInvoice(invoice: Invoice)={
+    repository.add(invoice)
   }
 }

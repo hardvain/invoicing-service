@@ -10,5 +10,5 @@ case class Invoice(
                     totalAmount: Double)
 
 object InvoiceProtocol extends DefaultJsonProtocol{
-  implicit val sprayFormat = jsonFormat15(Invoice)
+  implicit val sprayFormat = jsonFormat15(Invoice.apply)
 }
