@@ -9,6 +9,7 @@ import com.acme.invoiceservice.models.Invoice._
 /**
   * Dummy in memory repository for entities of type `A`. Parameterized over type `A`.
   * For demo purposes this stores the entities in memory.
+  * Also for demo purposes, this involves few methods that helps in filtering values from the collection dynamically
   */
 class InMemoryRepository[A](inMemoryEntityFilter: InMemoryEntityFilter[A]) extends Repository[A] {
   val entityBuffer = ListBuffer[A]()
