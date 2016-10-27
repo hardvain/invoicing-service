@@ -1,8 +1,6 @@
 package com.acme.invoiceservice.models
 
-import spray.http.DateTime
 import spray.json._
-import DefaultJsonProtocol._
 case class Invoice(
                     invoiceId: String, customerId: String, address: String, month: Int, invoiceType: String,
                     invoiceTypeLocalized: String, invoiceDate: String, paymentDueDate: String, invoiceNumber: Int,

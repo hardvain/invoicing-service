@@ -13,22 +13,11 @@ class MongoDBQueryBuilder {
       case filter: OrFilter => buildFromOrFilter(filter)
       case filter: NotFilter => buildFromNotFilter(filter)
       case filter: MatchFilter => buildFromMatchFilter(filter)
-      case filter: RangeFilter => buildFromRangeFilter(filter)
     }
   }
 
   private def buildFromMatchFilter(matchFilter: MatchFilter): Bson = {
     equal(matchFilter.field, matchFilter.value)
-  }
-
-  private def buildFromRangeFilter(rangeFilter: RangeFilter): Bson = {
-    val field = rangeFilter.field
-    val bsonList = ListBuffer[Bson]()
-    rangeFilter.gt.map(gtValue => bsonList += gt(field, gtValue))
-    rangeFilter.gte.map(gteValue => bsonList += gte(field, gteValue))
-    rangeFilter.lt.map(ltValue => bsonList += lt(field, ltValue))
-    rangeFilter.lte.map(lteValue => bsonList += lte(field, lteValue))
-    and(bsonList:_*)
   }
 
   private def buildFromAndFilter(andFilter: AndFilter) = {
