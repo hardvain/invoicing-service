@@ -9,10 +9,9 @@ import org.mongodb.scala.bson.conversions.Bson
   * This layer is not unit tested. Ideally it should be covered by an integration test talking directly to a MongoDB
   * @tparam A
   */
-class MongoRepository[A] extends Repository[A] {
-  private val builder: MongoDBQueryBuilder = new MongoDBQueryBuilder
+class MongoRepository[A](mongoDBQueryBuilder: MongoDBQueryBuilder) extends Repository[A] {
   override def query(filter:Filter): List[A] = {
-    val bsonFilter: Bson = builder.build(filter)
+    val bsonFilter: Bson = mongoDBQueryBuilder.build(filter)
     // use the above bson filter to query from dynamo db
     // throw ApplicationException in case of exception from mongo db
     List()

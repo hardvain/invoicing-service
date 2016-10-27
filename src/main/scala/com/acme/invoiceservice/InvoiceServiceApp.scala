@@ -5,7 +5,7 @@ import akka.io.IO
 import com.acme.invoiceservice.api.InvoiceServiceActor
 import com.acme.invoiceservice.models.{InMemoryInvoiceFilter, Invoice}
 import com.acme.invoiceservice.repository.{InMemoryRepository, MongoRepository}
-import com.acme.invoiceservice.services.InvoicingService
+import com.acme.invoiceservice.services.{InvoicingService, MongoDBQueryBuilder}
 import com.typesafe.config.ConfigFactory
 import spray.can.Http
 
@@ -21,7 +21,7 @@ object InvoiceServiceApp extends App {
   val repository = if(invoiceServiceConfig.isInMemory){
     new InMemoryRepository[Invoice](new InMemoryInvoiceFilter())
   } else {
-    new MongoRepository[Invoice]
+    new MongoRepository[Invoice](new MongoDBQueryBuilder)
   }
    private val invoicingService: InvoicingService = InvoicingService(repository)
   private val invoiceServiceActor: ActorRef = system.actorOf(Props(classOf[InvoiceServiceActor], invoiceServiceConfig, invoicingService), "invoice-service-actor")
