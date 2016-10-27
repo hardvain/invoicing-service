@@ -4,14 +4,13 @@ import akka.actor.ActorRefFactory
 import com.acme.invoiceservice.InvoiceServiceConfig
 import com.acme.invoiceservice.exceptions.ApplicationException
 import com.acme.invoiceservice.models.Invoice
-import com.acme.invoiceservice.models.InvoiceProtocol._
 import com.acme.invoiceservice.services.InvoicingService
 import spray.http.MediaTypes._
 import spray.http.{HttpEntity, StatusCodes}
 import spray.httpx.SprayJsonSupport._
 import spray.json._
 import spray.routing._
-
+import Invoice.InvoiceProtocol._
 
 /**
   * The core API for Invoicing Service.

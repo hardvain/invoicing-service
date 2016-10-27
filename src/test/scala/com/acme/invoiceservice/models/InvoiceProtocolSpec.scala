@@ -1,7 +1,7 @@
 package com.acme.invoiceservice.models
 
 import org.scalatest.{FreeSpec, Matchers}
-import InvoiceProtocol._
+import com.acme.invoiceservice.models.Invoice.InvoiceProtocol._
 import org.joda.time.DateTime
 import spray.json._
 class InvoiceProtocolSpec extends FreeSpec with Matchers{

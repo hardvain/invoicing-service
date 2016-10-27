@@ -1,10 +1,9 @@
 package com.acme.invoiceservice.repository
 
-import com.acme.invoiceservice.models.{InMemoryEntityFilter, Invoice}
+import com.acme.invoiceservice.models.InMemoryEntityFilter
 import com.acme.invoiceservice.models.InvoiceFilter._
 
 import scala.collection.mutable.ListBuffer
-import com.acme.invoiceservice.models.Invoice._
 
 /**
   * Dummy in memory repository for entities of type `A`. Parameterized over type `A`.
