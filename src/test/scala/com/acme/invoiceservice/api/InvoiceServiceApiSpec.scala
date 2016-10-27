@@ -13,19 +13,12 @@ import spray.http.{HttpEntity, MediaTypes, StatusCodes}
 import spray.json.DeserializationException
 import spray.routing._
 import spray.testkit.ScalatestRouteTest
+import com.acme.invoiceservice.api.InvoiceServiceApi._
+import com.acme.invoiceservice.exceptions.ApplicationException
 
 class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matchers with MockFactory {
 
   class InvoicingServiceStub extends InvoicingService(mock[Repository[Invoice]])
-
-  implicit def customRejectionHandler = RejectionHandler {
-    case MalformedRequestContentRejection(message, throwable) :: _ => ctx => ctx.complete(StatusCodes.BadRequest, message)
-  }
-
-  implicit def exceptionHandler = ExceptionHandler {
-    case e: DeserializationException =>
-      ctx => ctx.complete(StatusCodes.BadRequest, e.msg)
-  }
 
   private val mockInvoicingService: InvoicingService = mock[InvoicingServiceStub]
   val context = mock[ActorRefFactory]
@@ -61,6 +54,15 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
         Get("/invoices") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           responseAs[String] should be("[]")
+        }
+      }
+
+      "should return appropriate error message on Application Exception" in {
+        val exceptionMessage: String = "Oops, something went wrong while getting invoices"
+        (mockInvoicingService.getAllInvoices _).expects().throws(ApplicationException(exceptionMessage))
+        Get("/invoices") ~> invoiceServiceApi.routes ~> check {
+          status should be(StatusCodes.InternalServerError)
+          responseAs[String] should be(exceptionMessage)
         }
       }
     }
@@ -105,6 +107,25 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
         """.stripMargin
         Post("/invoices", HttpEntity(MediaTypes.`application/json`, dataJsonString)) ~> invoiceServiceApi.sealRoute(invoiceServiceApi.routes) ~> check {
           status should be(StatusCodes.BadRequest)
+        }
+      }
+
+      "should return appropriate error message on Application Exception" in {
+        val dataJsonString =
+          s"""
+          { "invoiceId":"$invoiceId", "customerId":"$customerId", "address":"$address", "month":$month,
+            "invoiceType":"$invoiceType", "invoiceTypeLocalized":"$invoiceLocalized", "invoiceDate":"${dateTime.toString}",
+            "paymentDueDate":"${dateTime.toString}", "invoiceNumber":$invoiceNumber, "startDate":"${dateTime.toString}", "endDate":"${dateTime.toString}",
+            "periodDescription":"$description", "amount":$amount, "vatAmount":$vatAmount, "totalAmount":$totalAmount
+          }
+        """.stripMargin
+        val invoice = Invoice(invoiceId, customerId, address, month.toInt, invoiceType, invoiceLocalized, dateTime, dateTime,
+          invoiceNumber.toInt, dateTime, dateTime, description, amount.toDouble, vatAmount.toDouble, totalAmount.toDouble)
+        val exceptionMessage: String = "Oops, something went wrong adding the invocie"
+        (mockInvoicingService.addInvoice _).expects(*).throws(ApplicationException(exceptionMessage))
+        Post("/invoices", HttpEntity(MediaTypes.`application/json`, dataJsonString)) ~> invoiceServiceApi.routes ~> check {
+          status should be(StatusCodes.InternalServerError)
+          responseAs[String] should be(exceptionMessage)
         }
       }
     }

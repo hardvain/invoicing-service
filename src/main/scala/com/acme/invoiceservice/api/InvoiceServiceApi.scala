@@ -2,6 +2,7 @@ package com.acme.invoiceservice.api
 
 import akka.actor.ActorRefFactory
 import com.acme.invoiceservice.InvoiceServiceConfig
+import com.acme.invoiceservice.exceptions.ApplicationException
 import com.acme.invoiceservice.models.Invoice
 import com.acme.invoiceservice.models.InvoiceProtocol._
 import com.acme.invoiceservice.services.InvoicingService
@@ -18,17 +19,25 @@ case class InvoiceServiceApi(config: InvoiceServiceConfig, invoicingService: Inv
     path("invoices") {
       get {
         parameterMap { params =>
-          val httpEntity = params.isEmpty match {
-            case true => getAllInvoices
-            case false => getInvoiceForFilters(params)
+          try {
+            val httpEntity = params.isEmpty match {
+              case true => getAllInvoices
+              case false => getInvoiceForFilters(params)
+            }
+            complete(StatusCodes.OK, httpEntity)
+          } catch {
+            case ApplicationException(message) => complete(StatusCodes.InternalServerError, message)
           }
-          complete(StatusCodes.OK, httpEntity)
         }
       } ~
         post {
           entity(as[Invoice]) { invoice =>
-            invoicingService.addInvoice(invoice)
-            complete(StatusCodes.OK)
+            try {
+              invoicingService.addInvoice(invoice)
+              complete(StatusCodes.OK)
+            } catch {
+              case ApplicationException(message) => complete(StatusCodes.InternalServerError, message)
+            }
           }
         }
     }
@@ -47,5 +56,16 @@ case class InvoiceServiceApi(config: InvoiceServiceConfig, invoicingService: Inv
   private def getAllInvoices: HttpEntity = {
     val invoices: List[Invoice] = invoicingService.getAllInvoices
     HttpEntity(`application/json`, JsArray(invoices.map(_.toJson).toVector).toString())
+  }
+}
+
+object InvoiceServiceApi {
+  implicit def customExceptionHandler = ExceptionHandler {
+    case e: DeserializationException =>
+      ctx => ctx.complete(StatusCodes.BadRequest, e.msg)
+  }
+
+  implicit def customRejectionHandler = RejectionHandler {
+    case List(r: MalformedRequestContentRejection) => ctx => ctx.complete(StatusCodes.BadRequest, r.message)
   }
 }
