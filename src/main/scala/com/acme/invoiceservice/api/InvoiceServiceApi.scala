@@ -18,9 +18,9 @@ case class InvoiceServiceApi(config: InvoiceServiceConfig, invoicingService: Inv
     path("invoices") {
       get {
         parameterMap { params =>
-          val httpEntity = params.size match {
-            case 0 => getAllInvoices
-            case _ => getInvoiceForFilters(params)
+          val httpEntity = params.isEmpty match {
+            case true => getAllInvoices
+            case false => getInvoiceForFilters(params)
           }
           complete(StatusCodes.OK, httpEntity)
         }
@@ -38,9 +38,9 @@ case class InvoiceServiceApi(config: InvoiceServiceConfig, invoicingService: Inv
 
   private def getInvoiceForFilters(filterMap: Map[String, String]): HttpEntity = {
     val invoices: List[Invoice] = invoicingService.getInvoiceForFilters(filterMap)
-    invoices.length match {
-      case 0 => HttpEntity(`application/json`, "The filter criteria yielded no results")
-      case _ => HttpEntity(`application/json`, JsArray(invoices.map(_.toJson).toVector).toString())
+    invoices.isEmpty match {
+      case true => HttpEntity(`application/json`, "The filter criteria yielded no results")
+      case false => HttpEntity(`application/json`, JsArray(invoices.map(_.toJson).toVector).toString())
     }
   }
 
