@@ -60,7 +60,7 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
         (mockInvoicingService.getAllInvoices _).expects().returns(List())
         Get("/invoices") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
-          responseAs[String] should be("The filter criteria yielded no results")
+          responseAs[String] should be("[]")
         }
       }
     }
