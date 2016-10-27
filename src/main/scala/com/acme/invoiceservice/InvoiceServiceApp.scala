@@ -3,7 +3,7 @@ package com.acme.invoiceservice
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.io.IO
 import com.acme.invoiceservice.api.InvoiceServiceActor
-import com.acme.invoiceservice.models.Invoice
+import com.acme.invoiceservice.models.{InMemoryInvoiceFilter, Invoice}
 import com.acme.invoiceservice.repository.{InMemoryRepository, MongoRepository}
 import com.acme.invoiceservice.services.InvoicingService
 import com.typesafe.config.ConfigFactory
@@ -19,7 +19,7 @@ object InvoiceServiceApp extends App {
   val config = ConfigFactory.load()
   private val invoiceServiceConfig: InvoiceServiceConfig = InvoiceServiceConfig(config)
   val repository = if(invoiceServiceConfig.isInMemory){
-    new InMemoryRepository[Invoice]
+    new InMemoryRepository[Invoice](new InMemoryInvoiceFilter())
   } else {
     new MongoRepository[Invoice]
   }
