@@ -17,3 +17,8 @@ This is an API for creating and querying invoices for the ACME cable TV company.
 * Implementations are provided for both MongoDB Backend and an inmemory backend.
 * Contains an intelligent QueryBuilder which is capable of composing simple to complex queries with no addition of code.
 
+
+
+## Foo Bar Assignment
+* This repo also contains code for foo bar assignment. It is located under `folder/FooBar.scala`.
+* It can be run using `scala foobar/FooBar.scala`.
