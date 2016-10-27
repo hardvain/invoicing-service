@@ -8,6 +8,10 @@ case class Invoice(
                     startDate: DateTime, endDate: DateTime, periodDescription: String, amount: Double, vatAmount: Double,
                     totalAmount: Double)
 
+
+/**
+  * Custom Spray Protocol to help in automatic serialization and deserialization between `Invoice` and Json
+  */
 object InvoiceProtocol extends DefaultJsonProtocol{
   implicit val dateTimeFormat : RootJsonFormat[DateTime] = new RootJsonFormat[DateTime] {
     override def read(json: JsValue): DateTime = {

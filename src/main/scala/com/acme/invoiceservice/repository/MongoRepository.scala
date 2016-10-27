@@ -5,6 +5,7 @@ import com.acme.invoiceservice.services.MongoDBQueryBuilder
 import org.mongodb.scala.bson.conversions.Bson
 
 /**
+  * Repository to interact with mongo db for any entity. Parameterized over type `A`.
   * This layer is not unit tested. Ideally it should be covered by an integration test talking directly to a MongoDB
   * @tparam A
   */

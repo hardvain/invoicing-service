@@ -4,8 +4,12 @@ import com.acme.invoiceservice.models.InvoiceFilter._
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters._
 
-import scala.collection.mutable.ListBuffer
-
+/**
+  * Builds a valid mongoDb filter from Invoice Filters.
+  * Provides `MatchFilter` to match for a value against a field
+  * Gives the ability to compose multiple primitive filters in to composite filters like
+  * `AndFiler`, `OrFilter` and `NotFilter`
+  */
 class MongoDBQueryBuilder {
   def build(invoiceFilter: Filter): Bson = {
     invoiceFilter match {

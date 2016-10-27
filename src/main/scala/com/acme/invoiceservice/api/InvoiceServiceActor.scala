@@ -5,6 +5,12 @@ import com.acme.invoiceservice.InvoiceServiceConfig
 import com.acme.invoiceservice.api.InvoiceServiceApi._
 import com.acme.invoiceservice.services.InvoicingService
 import spray.routing._
+
+/**
+  * The handler that is provided to Spray to handle incoming requests
+  * @param config
+  * @param invoicingService
+  */
 class InvoiceServiceActor(config: InvoiceServiceConfig, invoicingService: InvoicingService) extends Actor with HttpService {
   private val invoiceServiceApi: InvoiceServiceApi = InvoiceServiceApi(config, invoicingService, context)
 
