@@ -1,5 +1,6 @@
 package com.acme.invoiceservice.models
 
+import com.acme.invoiceservice.exceptions.InvalidDataException
 import org.joda.time.DateTime
 
 /**
@@ -23,7 +24,7 @@ class InMemoryInvoiceFilter extends InMemoryEntityFilter[Invoice]{
      case "vatAmount" => (invoice: Invoice) => invoice.vatAmount == value.toString.toDouble
      case "totalAmount" => (invoice: Invoice) => invoice.totalAmount == value.toString.toDouble
      case "purchaseType" => (invoice: Invoice) => invoice.purchaseType == PurchaseType.parseString(value.toString)
-     case _ => throw new Exception(s"Unknown filter $fieldName")
+     case _ => throw InvalidDataException(s"Unknown filter $fieldName")
    }
  }
 }

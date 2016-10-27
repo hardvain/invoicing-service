@@ -14,17 +14,22 @@ class MongoRepository[A] extends Repository[A] {
   override def query(filter:Filter): List[A] = {
     val bsonFilter: Bson = builder.build(filter)
     // use the above bson filter to query from dynamo db
+    // throw ApplicationException in case of exception from mongo db
     List()
   }
 
   override def getAll: List[A] = {
     // get all records from dynamo db
+    // throw ApplicationException in case of exception from mongo db
+
     List()
   }
 
 
   override def add(a: A): Unit = {
     // save the entity to dynamodb
+    // throw ApplicationException in case of exception from mongo db
+
   }
 }
 

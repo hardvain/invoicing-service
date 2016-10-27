@@ -2,7 +2,7 @@ package com.acme.invoiceservice.api
 
 import akka.actor.ActorRefFactory
 import com.acme.invoiceservice.InvoiceServiceConfig
-import com.acme.invoiceservice.exceptions.ApplicationException
+import com.acme.invoiceservice.exceptions.{ApplicationException, InvalidDataException}
 import com.acme.invoiceservice.models.Invoice
 import com.acme.invoiceservice.services.InvoicingService
 import spray.http.MediaTypes._
@@ -74,6 +74,8 @@ object InvoiceServiceApi {
   implicit def customExceptionHandler = ExceptionHandler {
     case e: DeserializationException =>
       ctx => ctx.complete(StatusCodes.BadRequest, e.msg)
+    case e:InvalidDataException =>
+      ctx => ctx.complete(StatusCodes.UnprocessableEntity, e.message)
   }
 
   implicit def customRejectionHandler = RejectionHandler {

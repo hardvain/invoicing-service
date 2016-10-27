@@ -4,20 +4,6 @@ import com.acme.invoiceservice.models.PurchaseType.PropertyType
 import org.joda.time.DateTime
 import spray.json.{DefaultJsonProtocol, DeserializationException, JsString, JsValue, RootJsonFormat}
 
-object PurchaseType extends Enumeration {
-  val Shop = Value("shop")
-  val Regular = Value("regular")
-  type PropertyType = Value
-
-  def parseString(string:String)={
-    string match {
-      case "shop" => Shop
-      case "regular" => Regular
-    }
-  }
-}
-
-
 case class Invoice(
                     invoiceId: String, customerId: String, address: String, month: Int, purchaseType: PurchaseType.PropertyType,
                     invoiceTypeLocalized: String, invoiceDate: DateTime, paymentDueDate: DateTime, invoiceNumber: Int,
