@@ -16,6 +16,7 @@ import Invoice.InvoiceProtocol._
   * The core API for Invoicing Service.
   * Defines the routes GET and POST.
   * DELETE and PUT does not make sense in case of Invoices as Invoices are considered to be immutable.
+  *
   * @param config
   * @param invoicingService
   * @param refFactory
@@ -24,30 +25,32 @@ case class InvoiceServiceApi(config: InvoiceServiceConfig, invoicingService: Inv
   extends HttpService {
 
   val routes: Route = {
-    path("invoices") {
-      get {
-        parameterMap { params =>
-          try {
-            val httpEntity = params.isEmpty match {
-              case true => getAllInvoices
-              case false => getInvoiceForFilters(params)
-            }
-            complete(StatusCodes.OK, httpEntity)
-          } catch {
-            case ApplicationException(message) => complete(StatusCodes.InternalServerError, message)
-          }
-        }
-      } ~
-        post {
-          entity(as[Invoice]) { invoice =>
+    pathPrefix("sysapi" / "v1.0") {
+      path("invoices") {
+        get {
+          parameterMap { params =>
             try {
-              invoicingService.addInvoice(invoice)
-              complete(StatusCodes.OK)
+              val httpEntity = params.isEmpty match {
+                case true => getAllInvoices
+                case false => getInvoiceForFilters(params)
+              }
+              complete(StatusCodes.OK, httpEntity)
             } catch {
               case ApplicationException(message) => complete(StatusCodes.InternalServerError, message)
             }
           }
-        }
+        } ~
+          post {
+            entity(as[Invoice]) { invoice =>
+              try {
+                invoicingService.addInvoice(invoice)
+                complete(StatusCodes.OK)
+              } catch {
+                case ApplicationException(message) => complete(StatusCodes.InternalServerError, message)
+              }
+            }
+          }
+      }
     }
   }
 

@@ -35,7 +35,7 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
         )
         val parameterMap = Map("customerId" -> "customer1", "addressId" -> "address1")
         (mockInvoicingService.getInvoiceForFilters _).expects(parameterMap).returns(invoices)
-        Get("/invoices?customerId=customer1&addressId=address1") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices?customerId=customer1&addressId=address1") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
         }
       }
@@ -43,7 +43,7 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
       "should return appropriate message when search results are empty " in {
         val parameterMap = Map("customerId" -> "customer1", "addressId" -> "address1")
         (mockInvoicingService.getInvoiceForFilters _).expects(parameterMap).returns(List[Invoice]())
-        Get("/invoices?customerId=customer1&addressId=address1") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices?customerId=customer1&addressId=address1") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           responseAs[String] should be("The filter criteria yielded no results")
         }
@@ -51,7 +51,7 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
 
       "should call getAllInvoices when no filter params are passed " in {
         (mockInvoicingService.getAllInvoices _).expects().returns(List())
-        Get("/invoices") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           responseAs[String] should be("[]")
         }
@@ -60,7 +60,7 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
       "should return appropriate error message on Application Exception" in {
         val exceptionMessage: String = "Oops, something went wrong while getting invoices"
         (mockInvoicingService.getAllInvoices _).expects().throws(ApplicationException(exceptionMessage))
-        Get("/invoices") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.InternalServerError)
           responseAs[String] should be(exceptionMessage)
         }
@@ -91,7 +91,7 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
         val invoice = Invoice(invoiceId, customerId, address, month.toInt, invoiceType, invoiceLocalized, dateTime, dateTime,
           invoiceNumber.toInt, dateTime, dateTime, description, amount.toDouble, vatAmount.toDouble, totalAmount.toDouble)
         (mockInvoicingService.addInvoice _).expects(*)
-        Post("/invoices", HttpEntity(MediaTypes.`application/json`, dataJsonString)) ~> invoiceServiceApi.routes ~> check {
+        Post("/sysapi/v1.0/invoices", HttpEntity(MediaTypes.`application/json`, dataJsonString)) ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
         }
       }
@@ -105,7 +105,7 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
             "periodDescription":"$description", "amount":$amount, "vatAmount":$vatAmount, "totalAmount":$totalAmount
           }
         """.stripMargin
-        Post("/invoices", HttpEntity(MediaTypes.`application/json`, dataJsonString)) ~> invoiceServiceApi.sealRoute(invoiceServiceApi.routes) ~> check {
+        Post("/sysapi/v1.0/invoices", HttpEntity(MediaTypes.`application/json`, dataJsonString)) ~> invoiceServiceApi.sealRoute(invoiceServiceApi.routes) ~> check {
           status should be(StatusCodes.BadRequest)
         }
       }
@@ -123,7 +123,7 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
           invoiceNumber.toInt, dateTime, dateTime, description, amount.toDouble, vatAmount.toDouble, totalAmount.toDouble)
         val exceptionMessage: String = "Oops, something went wrong adding the invocie"
         (mockInvoicingService.addInvoice _).expects(*).throws(ApplicationException(exceptionMessage))
-        Post("/invoices", HttpEntity(MediaTypes.`application/json`, dataJsonString)) ~> invoiceServiceApi.routes ~> check {
+        Post("/sysapi/v1.0/invoices", HttpEntity(MediaTypes.`application/json`, dataJsonString)) ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.InternalServerError)
           responseAs[String] should be(exceptionMessage)
         }

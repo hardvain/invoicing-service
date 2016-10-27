@@ -43,7 +43,7 @@ class RequirementsSpec extends FreeSpec with ScalatestRouteTest with Matchers wi
   private val invoiceServiceApi: InvoiceServiceApi = InvoiceServiceApi(invoiceServiceConfig, invoicingService, context)
 
   invoices.foreach { invoice =>
-    Post("/invoices", HttpEntity(MediaTypes.`application/json`, invoice.toJson.toString())) ~> invoiceServiceApi.routes ~> check {
+    Post("/sysapi/v1.0/invoices", HttpEntity(MediaTypes.`application/json`, invoice.toJson.toString())) ~> invoiceServiceApi.routes ~> check {
       status should be(StatusCodes.OK)
     }
   }
@@ -51,7 +51,7 @@ class RequirementsSpec extends FreeSpec with ScalatestRouteTest with Matchers wi
   "Requirements" - {
     "get invoice by customer and month" - {
       "return matching value if present" in {
-        Get("/invoices?customerId=customer1&month=1") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices?customerId=customer1&month=1") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           val json = responseAs[String].parseJson
           assert(json.isInstanceOf[JsArray])
@@ -59,7 +59,7 @@ class RequirementsSpec extends FreeSpec with ScalatestRouteTest with Matchers wi
         }
       }
       "return no result found if not present" in {
-        Get("/invoices?customerId=customer1&month=3") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices?customerId=customer1&month=3") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           assert(responseAs[String] == "The filter criteria yielded no results")
         }
@@ -68,7 +68,7 @@ class RequirementsSpec extends FreeSpec with ScalatestRouteTest with Matchers wi
 
     "get invoice by customer, invoice type and month" - {
       "return matching value if present" in {
-        Get("/invoices?customerId=customer1&month=1&invoiceType=shop") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices?customerId=customer1&month=1&invoiceType=shop") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           val json = responseAs[String].parseJson
           assert(json.isInstanceOf[JsArray])
@@ -76,7 +76,7 @@ class RequirementsSpec extends FreeSpec with ScalatestRouteTest with Matchers wi
         }
       }
       "return no result found if not present" in {
-        Get("/invoices?customerId=customer1&month=1&invoiceType=regular") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices?customerId=customer1&month=1&invoiceType=regular") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           assert(responseAs[String] == "The filter criteria yielded no results")
         }
@@ -85,7 +85,7 @@ class RequirementsSpec extends FreeSpec with ScalatestRouteTest with Matchers wi
 
     "get invoice by customer and address" - {
       "return matching value if present" in {
-        Get("/invoices?customerId=customer1&address=address1") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices?customerId=customer1&address=address1") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           val json = responseAs[String].parseJson
           assert(json.isInstanceOf[JsArray])
@@ -93,7 +93,7 @@ class RequirementsSpec extends FreeSpec with ScalatestRouteTest with Matchers wi
         }
       }
       "return no result found if not present" in {
-        Get("/invoices?customerId=customer100") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices?customerId=customer100") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           assert(responseAs[String] == "The filter criteria yielded no results")
         }
@@ -102,7 +102,7 @@ class RequirementsSpec extends FreeSpec with ScalatestRouteTest with Matchers wi
 
     "get invoice by customer " - {
       "return matching value if present" in {
-        Get("/invoices?customerId=customer1") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices?customerId=customer1") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           val json = responseAs[String].parseJson
           assert(json.isInstanceOf[JsArray])
@@ -110,7 +110,7 @@ class RequirementsSpec extends FreeSpec with ScalatestRouteTest with Matchers wi
         }
       }
       "return no result found if not present" in {
-        Get("/invoices?customerId=customer1&address=address3") ~> invoiceServiceApi.routes ~> check {
+        Get("/sysapi/v1.0/invoices?customerId=customer1&address=address3") ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
           assert(responseAs[String] == "The filter criteria yielded no results")
         }
