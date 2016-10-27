@@ -14,6 +14,7 @@ import spray.httpx.SprayJsonSupport._
 case class InvoiceServiceApi(config: InvoiceServiceConfig, invoicingService: InvoicingService, refFactory: ActorRefFactory)
   extends HttpService {
 
+
   val routes: Route = {
     path("invoices") {
       get {
@@ -32,9 +33,10 @@ case class InvoiceServiceApi(config: InvoiceServiceConfig, invoicingService: Inv
         }
       } ~
       post{
-        entity(as[Invoice]) { invoice =>
-          invoicingService.addInvoice(invoice)
-          complete("")
+        entity(as[String]) { invoiceString =>
+            val invoice: Invoice = invoiceString.parseJson.convertTo[Invoice]
+            invoicingService.addInvoice(invoice)
+            complete("")
         }
       }
     }

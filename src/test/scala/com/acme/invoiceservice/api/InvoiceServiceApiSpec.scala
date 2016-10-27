@@ -11,12 +11,17 @@ import org.scalatest.{FreeSpec, Matchers}
 import spray.http.HttpHeaders.`Content-Type`
 import spray.http.MediaTypes._
 import spray.http.StatusCodes
+import spray.json.DeserializationException
+import spray.routing.ExceptionHandler
 import spray.testkit.ScalatestRouteTest
 
 class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matchers with MockFactory {
 
   class InvoicingServiceStub extends InvoicingService(mock[Repository[Invoice]])
-
+  implicit def exceptionHandler = ExceptionHandler {
+    case e:DeserializationException =>
+      ctx => ctx.complete(StatusCodes.BadRequest, e.msg)
+  }
   private val mockInvoicingService: InvoicingService = mock[InvoicingServiceStub]
   val context = mock[ActorRefFactory]
   private val invoiceServiceConfig: InvoiceServiceConfig = InvoiceServiceConfig(ConfigFactory.load())
@@ -54,43 +59,46 @@ class InvoiceServiceApiSpec extends FreeSpec with ScalatestRouteTest with Matche
       }
     }
     "POST" - {
+      val invoiceId: String = "invoice1"
+      val customerId: String = "customer1"
+      val address: String = "random address"
+      val month: String = """3"""
+      val invoiceType: String = "regular"
+      val invoiceLocalized: String = "locale specific invoice"
+      val date: String = "3/3/89"
+      val invoiceNumber: String = """1"""
+      val description: String = "description"
+      val amount: String = """100"""
+      val vatAmount: String = """200"""
+      val totalAmount: String = """300"""
       "should create invoice when posted with valid data" in {
-        val invoiceId: String = """"invoice1""""
-        val customerId: String = """"customer1""""
-        val address: String = """"random address""""
-        val month: String = """3"""
-        val invoiceType: String = """"regular""""
-        val invoiceLocalized: String = """"locale specific invoice""""
-        val date: String = """"3/3/89""""
-        val invoiceNumber: String = """1"""
-        val description: String = """"description""""
-        val amount: String = """100"""
-        val vatAmount: String = """200"""
-        val totalAmount: String = """300"""
-        val data =
+        val dataJsonString =
           s"""
-          {
-            "invoiceId":$invoiceId,
-            "customerId":$customerId,
-            "address":$address,
-            "month":$month,
-            "invoiceType":$invoiceType,
-            "invoiceTypeLocalized":$invoiceLocalized
-            "invoiceDate":$date,
-            "paymentDueDate":$date,
-            "invoiceNumber":$invoiceNumber,
-            "startDate":$date,
-            "periodDescription":$description,
-            "amount":$amount,
-            "vatAmount":$vatAmount,
-            "totalAmount":$totalAmount"
+          { "invoiceId":"$invoiceId", "customerId":"$customerId", "address":"$address", "month":$month,
+            "invoiceType":"$invoiceType", "invoiceTypeLocalized":"$invoiceLocalized", "invoiceDate":"$date",
+            "paymentDueDate":"$date", "invoiceNumber":$invoiceNumber, "startDate":"$date", "endDate":"$date",
+            "periodDescription":"$description", "amount":$amount, "vatAmount":$vatAmount, "totalAmount":$totalAmount
           }
         """.stripMargin
         val invoice = Invoice(invoiceId, customerId, address, month.toInt, invoiceType, invoiceLocalized, date, date,
           invoiceNumber.toInt, date, date, description, amount.toDouble, vatAmount.toDouble, totalAmount.toDouble)
         (mockInvoicingService.addInvoice _).expects(invoice)
-        Post("/invoices", data) ~> addHeader(`Content-Type`(`application/json`)) ~> invoiceServiceApi.routes ~> check {
+        Post("/invoices", dataJsonString) ~> addHeader(`Content-Type`(`application/json`)) ~> invoiceServiceApi.routes ~> check {
           status should be(StatusCodes.OK)
+        }
+      }
+
+      "should throw bad request when one of the mandatory fields are missing" in {
+        val dataJsonString =
+          s"""
+          { "invoiceId":"$invoiceId",  "address":"$address", "month":$month,
+            "invoiceType":"$invoiceType", "invoiceTypeLocalized":"$invoiceLocalized", "invoiceDate":"$date",
+            "paymentDueDate":"$date", "invoiceNumber":$invoiceNumber, "startDate":"$date", "endDate":"$date",
+            "periodDescription":"$description", "amount":$amount, "vatAmount":$vatAmount, "totalAmount":$totalAmount
+          }
+        """.stripMargin
+        Post("/invoices", dataJsonString) ~> addHeader(`Content-Type`(`application/json`)) ~> invoiceServiceApi.routes ~> check {
+          status should be(StatusCodes.BadRequest)
         }
       }
     }
